@@ -306,15 +306,6 @@ app.get('/anuncios', async (req, res) => {
     return res.redirect('/');
   }
 
-  // Filtros de preço, status, categoria e pesquisa
-  const priceRanges = [
-    { label: 'Até R$ 100', min: 0, max: 100 },
-    { label: 'De R$ 100 até R$ 500', min: 100, max: 500 },
-    { label: 'De R$ 500 até R$ 1000', min: 500, max: 1000 },
-    { label: 'De R$ 1000 até R$ 5000', min: 1000, max: 5000 },
-    { label: 'Acima de R$ 5000', min: 5000, max: 100000 },
-  ];
-
   const statuses = [
     { label: 'Ativo', value: 'active' },
     { label: 'Pausado', value: 'paused' },
@@ -334,15 +325,15 @@ app.get('/anuncios', async (req, res) => {
     { label: 'Informática', value: 'MLB1367' },
   ];
 
-  const { price_min, price_max, status, category_id, keyword } = req.query;
+  const { status, category_id, keyword, page = 1 } = req.query;
   let queryParams = {};
 
-  if (price_min && price_max) {
-    queryParams.price = { $gte: price_min, $lte: price_max };
-  }
   if (status) queryParams.status = status;
   if (category_id) queryParams.category_id = category_id;
   if (keyword) queryParams.q = keyword;
+
+  const itemsPerPage = 30; // Número de itens por página
+  const offset = (page - 1) * itemsPerPage;
 
   try {
     const response = await axios.get('https://api.mercadolibre.com/users/me', {
@@ -352,13 +343,12 @@ app.get('/anuncios', async (req, res) => {
     });
 
     const userId = response.data.id;
-    
-    // Buscando os itens específicos do usuário
+
     const anuncios = await axios.get(`https://api.mercadolibre.com/users/${userId}/items/search`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-      params: queryParams, // Incluindo os filtros de pesquisa aqui
+      params: { ...queryParams, offset, limit: itemsPerPage }, // Paginação
     });
 
     const itemIds = anuncios.data.results;
@@ -373,7 +363,19 @@ app.get('/anuncios', async (req, res) => {
       anunciosDetalhados.push(itemDetails.data);
     }
 
-    // Função para verificar a qualidade do anúncio
+    const totalItems = anuncios.data.paging.total;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const paginationHtml = () => {
+      let pagination = '';
+      for (let i = 1; i <= totalPages; i++) {
+        pagination += `
+          <a href="/anuncios?page=${i}&status=${status || ''}&category_id=${category_id || ''}&keyword=${keyword || ''}" 
+            class="pagina-link ${i === parseInt(page) ? 'ativo' : ''}">${i}</a>
+        `;
+      }
+      return pagination;
+    };
+
     const checkQuality = (item) => {
       const issues = [];
       if (!item.title || item.title.trim() === '') {
@@ -405,6 +407,9 @@ app.get('/anuncios', async (req, res) => {
             <p class="preco">R$ ${item.price.toFixed(2)}</p>
             <p class="quantidade">Quantidade disponível: ${item.available_quantity}</p>
             <p class="qualidade">${qualityIssues}</p>
+            <p class="mlb-id">
+              <span id="mlb-id-${item.id.replace('MLB', '')}" onclick="copyMLB('${item.id.replace('MLB', '')}')">${item.id.replace('MLB', '')}</span>
+            </p>
             ${item.status === 'cancelled' ? `
               <form method="POST" action="/anuncio/${item.id}/reactivate">
                 <button type="submit" class="botao-reativar">Reativar</button>
@@ -494,6 +499,12 @@ app.get('/anuncios', async (req, res) => {
               font-size: 14px;
               margin: 5px 0;
             }
+            .mlb-id {
+              font-size: 14px;
+              margin: 5px 0;
+              cursor: pointer;
+              color: #007bff;
+            }
             .botao-reativar {
               padding: 10px;
               background-color: #ffc107;
@@ -506,40 +517,68 @@ app.get('/anuncios', async (req, res) => {
             .botao-reativar:hover {
               background-color: #e0a800;
             }
+            #paginacao {
+              display: flex;
+              justify-content: center;
+              margin-top: 20px;
+            }
+            .pagina-link {
+              padding: 5px 10px;
+              margin: 0 3px;
+              background-color: #007bff;
+              color: white;
+              text-decoration: none;
+              border-radius: 5px;
+            }
+            .pagina-link.ativo {
+              background-color: #28a745;
+            }
+            .pagina-link:hover {
+              background-color: #218838;
+            }
           </style>
+          <script>
+            function copyMLB(itemId) {
+              const range = document.createRange();
+              const span = document.getElementById('mlb-id-' + itemId);
+              range.selectNode(span);
+              window.getSelection().removeAllRanges();
+              window.getSelection().addRange(range);
+              document.execCommand('copy');
+            }
+          </script>
         </head>
         <body>
-          <h1>Meus Anúncios</h1>
-          <form method="GET" action="/anuncios">
-            <div class="filtro">
-              <input type="text" name="keyword" placeholder="Pesquisar por palavra-chave..." value="${keyword || ''}">
-              <select name="price_min">
-                <option value="">Preço</option>
-                ${priceRanges.map(range => `
-                  <option value="${range.min}" ${price_min === range.min ? 'selected' : ''}>${range.label}</option>
-                `).join('')}
-              </select>
+          <h1>Gerenciador de Anúncios</h1>
+          <div class="filtro">
+            <form method="GET" action="/anuncios">
+              <input type="text" name="keyword" placeholder="Buscar..." value="${keyword || ''}">
               <select name="status">
                 <option value="">Status</option>
-                ${statuses.map(status => `
-                  <option value="${status.value}" ${status.value === status ? 'selected' : ''}>${status.label}</option>
+                ${statuses.map((statusOption) => `
+                  <option value="${statusOption.value}" ${status === statusOption.value ? 'selected' : ''}>${statusOption.label}</option>
                 `).join('')}
               </select>
               <select name="category_id">
                 <option value="">Categoria</option>
-                ${categories.map(category => `
-                  <option value="${category.value}" ${category.value === category_id ? 'selected' : ''}>${category.label}</option>
+                ${categories.map((categoryOption) => `
+                  <option value="${categoryOption.value}" ${category_id === categoryOption.value ? 'selected' : ''}>${categoryOption.label}</option>
                 `).join('')}
               </select>
               <button type="submit">Filtrar</button>
-            </div>
-          </form>
-          <div id="anuncios">${anunciosHtml}</div>
+            </form>
+          </div>
+          <div class="anuncios-lista">
+            ${anunciosHtml}
+          </div>
+          <div id="paginacao">
+            ${paginationHtml()}
+          </div>
         </body>
       </html>
     `);
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).send('Erro ao carregar os anúncios.');
   }
 });
@@ -595,7 +634,7 @@ app.get('/adm-anuncios', async (req, res) => {
             color: #444;
           }
 
-          input[type="text"], select {
+          input[type="text"], select, input[type="file"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 20px;
@@ -607,7 +646,7 @@ app.get('/adm-anuncios', async (req, res) => {
             transition: border-color 0.3s ease;
           }
 
-          input[type="text"]:focus, select:focus {
+          input[type="text"]:focus, select:focus, input[type="file"]:focus {
             border-color: #007BFF;
             outline: none;
           }
@@ -681,6 +720,7 @@ app.get('/adm-anuncios', async (req, res) => {
       <body>
         <h1>Painel de Administração</h1>
 
+        <!-- Formulário para atualizar status -->
         <form method="POST" action="/atualizar-status">
           <label for="item_id">Informe o ID do Anúncio (MLB):</label>
           <input type="text" name="item_id" id="item_id" required>
@@ -694,11 +734,18 @@ app.get('/adm-anuncios', async (req, res) => {
           <button type="submit">Atualizar Status</button>
         </form>
 
-        <form method="POST" action="/reativar-anuncio">
-          <label for="item_id_cancelado">Informe o ID do Anúncio Cancelado (MLB) para Reativar:</label>
-          <input type="text" name="item_id_cancelado" id="item_id_cancelado" required>
+        <!-- Formulário para atualizar valor e estoque -->
+        <form method="POST" action="/atualizar-anuncio">
+          <label for="item_id_valor">Informe o ID do Anúncio (MLB):</label>
+          <input type="text" name="item_id" id="item_id_valor" required>
 
-          <button type="submit">Reativar Anúncio Cancelado</button>
+          <label for="price">Novo Preço (R$):</label>
+          <input type="text" name="price" id="price" required>
+
+          <label for="available_quantity">Novo Estoque:</label>
+          <input type="text" name="available_quantity" id="available_quantity" required>
+
+          <button type="submit">Atualizar Valor e Estoque</button>
         </form>
 
         <div class="back-button-container">
@@ -709,7 +756,7 @@ app.get('/adm-anuncios', async (req, res) => {
 
         <!-- Popup de sucesso ou erro -->
         <div id="popup" class="popup ${status ? (status === 'success' ? 'success' : 'error') : ''}">
-          ${status === 'success' ? 'Status do anúncio atualizado com sucesso!' : status === 'error' ? 'Erro ao atualizar o status do anúncio.' : ''}
+          ${status === 'success' ? 'Ação realizada com sucesso!' : status === 'error' ? 'Erro ao realizar a ação.' : ''}
         </div>
 
         <script>
@@ -748,9 +795,9 @@ app.post('/atualizar-status', async (req, res) => {
   }
 });
 
-// Reativar Anúncio Cancelado
-app.post('/reativar-anuncio', async (req, res) => {
-  const { item_id_cancelado } = req.body;
+// Atualizar Valor e Estoque
+app.post('/atualizar-anuncio', async (req, res) => {
+  const { item_id, price, available_quantity } = req.body;
   const accessToken = req.session.accessToken;
 
   if (!accessToken) {
@@ -758,8 +805,32 @@ app.post('/reativar-anuncio', async (req, res) => {
   }
 
   try {
-    // Tentando reativar o anúncio
-    const response = await axios.put(`https://api.mercadolibre.com/items/MLB${item_id_cancelado}`, { status: 'active' }, {
+    await axios.put(`https://api.mercadolibre.com/items/MLB${item_id}`, {
+      price,
+      available_quantity
+    }, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    res.redirect('/adm-anuncios?status=success');
+  } catch (error) {
+    console.error(error);
+    res.redirect('/adm-anuncios?status=error');
+  }
+});
+
+
+// Atualizar Status do Anúncio
+app.post('/atualizar-status', async (req, res) => {
+  const { item_id, status } = req.body;
+  const accessToken = req.session.accessToken;
+
+  if (!accessToken) {
+    return res.redirect('/');
+  }
+
+  try {
+    await axios.put(`https://api.mercadolibre.com/items/MLB${item_id}`, { status }, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
 
