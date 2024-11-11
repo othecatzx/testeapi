@@ -1,13 +1,15 @@
+
 const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const app = express();
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 // Middleware para servir arquivos estáticos
 app.use(express.static('public'));
+
 
 app.use(session({
   secret: 'segredo_aleatorio',
@@ -27,16 +29,84 @@ app.get('/', (req, res) => {
   <div class="navbar">
     <img src="../imgs/logo.png" alt="Logo">
   </div>
-
-  <div class="login-container">
-    <h1>Login</h1>
-    <form method="POST" action="/api/anuncios">
-      <label for="access_token">Informe seu Access Token:</label>
-      <input type="text" id="access_token" name="access_token" required placeholder="Digite seu Access Token">
-      <button type="submit">Entrar</button>
-    </form>
-  </div>
 </body>
+    <html>
+  <head>
+    <title>Login</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #041322;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .login-container {
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        max-width: 350px;
+        width: 100%;
+      }
+      h1 {
+        color: #007BFF;
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+      label {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+      }
+      input {
+        padding: 12px;
+        font-size: 16px;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+      input:focus {
+        border-color: #007BFF;
+      }
+      button {
+        padding: 12px;
+        font-size: 16px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        width: 100%;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      button:active {
+        background-color: #004085;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <h1>Login</h1>
+      <form method="POST" action="/api/anuncios">
+        <label for="access_token">Informe seu Access Token:</label>
+        <input type="text" id="access_token" name="access_token" required placeholder="Digite seu Access Token">
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+  </body>
 </html>
 
   `);
@@ -62,7 +132,7 @@ app.get('/adm', (req, res) => {
     return res.redirect('/');
   }
 
-  res.send(`
+  res.send(` 
        <html>
         <head>
             <link rel="stylesheet" href="/css/adm.css">
@@ -92,6 +162,7 @@ app.get('/adm', (req, res) => {
         </div>
     </body>
     </html>
+
 
   `);
 });
@@ -442,6 +513,7 @@ app.get('/anuncios', async (req, res) => {
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       transform: scale(0.98);
     }
+
           </style>
           <script>
             function copyMLB(itemId) {
