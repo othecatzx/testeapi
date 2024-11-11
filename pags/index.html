@@ -1,29 +1,180 @@
-    <html>
-        <head>
-            <link rel="stylesheet" href="../public/css/adm.css">
-    <body>
-        <div class="navbar">
-        <img src="../public/imgs/logo.png" alt="Logo">
-        </div>
-    
-        <div class="panel-container">
-        <h1>Painel de Administração</h1>
-    
-        <form method="GET" action="/anuncios">
-            <button type="submit">Ver meus Anúncios</button>
-        </form>
-    
-        <form method="GET" action="/adm-anuncios">
-            <button type="submit">Administrar meus Anúncios</button>
-        </form>
-    
-        <form method="GET" action="/vendas">
-            <button type="submit">Vendas</button>
-        </form>
-    
-        <form method="POST" action="/api/logout">
-            <button type="submit">Logout</button>
-        </form>
-        </div>
-    </body>
-    </html>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gerenciador de Anúncios</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+    .navbar {
+      width: 100%;
+      background-color: #00438b;
+      padding: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      border-bottom: 2px solid white;
+    }
+    .navbar img {
+      max-width: 70px;
+      height: auto;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background-color: #007bff;
+      color: white;
+      margin: 70px 0 20px; /* Ajuste para compensar a navbar fixa */
+    }
+    .filtro {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filtro input, .filtro select, .filtro button {
+      padding: 10px;
+      margin: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      min-width: 150px;
+      max-width: 200px;
+    }
+    .filtro button {
+      background-color: #28a745;
+      color: white;
+      cursor: pointer;
+    }
+    .filtro button:hover {
+      background-color: #218838;
+    }
+    .anuncio {
+      display: flex;
+      margin: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+      padding: 20px;
+      align-items: center;
+    }
+    .imagem {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      margin-right: 20px;
+    }
+    .anuncio-info {
+      flex-grow: 1;
+    }
+    .titulo {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .status {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .preco, .quantidade {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    .mlb-id {
+      font-size: 14px;
+      margin: 5px 0;
+      cursor: pointer;
+      color: #007bff;
+    }
+    .botao-reativar {
+      padding: 10px;
+      background-color: #ffc107;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+      width: 100%;
+    }
+    .botao-reativar:hover {
+      background-color: #e0a800;
+    }
+    #paginacao {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .pagina-link {
+      padding: 5px 10px;
+      margin: 0 3px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .pagina-link.ativo {
+      background-color: #28a745;
+    }
+    .pagina-link:hover {
+      background-color: #218838;
+    }
+  </style>
+  <script>
+    function copyMLB(itemId) {
+      const span = document.getElementById('mlb-id-' + itemId);
+      navigator.clipboard.writeText(span.textContent).then(() => {
+        alert("ID copiado: " + span.textContent);
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="navbar">
+    <img src="../public/imgs/logo.png" alt="Logo">
+  </div>
+  
+  <div class="filtro">
+    <form method="GET" action="/anuncios">
+      <input type="text" name="keyword" placeholder="Buscar..." value="">
+      <select name="status">
+        <option value="">Status</option>
+        <option value="active">Ativo</option>
+        <option value="paused">Pausado</option>
+      </select>
+      <select name="category_id">
+        <option value="">Categoria</option>
+        <option value="123">Categoria 1</option>
+        <option value="456">Categoria 2</option>
+      </select>
+      <button type="submit">Filtrar</button>
+    </form>
+  </div>
+  <div class="anuncios-lista">
+    <div class="anuncio">
+      <img src="https://via.placeholder.com/150" class="imagem" alt="Imagem do Anúncio">
+      <div class="anuncio-info">
+        <div class="titulo">Título do Anúncio</div>
+        <div class="status">Status: Ativo</div>
+        <div class="preco">Preço: R$100,00</div>
+        <div class="quantidade">Quantidade: 5</div>
+        <div class="mlb-id" id="mlb-id-1" onclick="copyMLB(1)">MLB123456789</div>
+      </div>
+      <button class="botao-reativar">Reativar</button>
+    </div>
+  </div>
+  <div id="paginacao">
+    <a href="#" class="pagina-link">1</a>
+    <a href="#" class="pagina-link ativo">2</a>
+    <a href="#" class="pagina-link">3</a>
+  </div>
+</body>
+</html>

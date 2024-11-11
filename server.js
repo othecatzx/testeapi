@@ -419,6 +419,29 @@ app.get('/anuncios', async (req, res) => {
             .pagina-link:hover {
               background-color: #218838;
             }
+            /* Botão "Voltar" */
+    .btn-back {
+      margin: 30px;
+      background-color: #007bff;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .btn-back:hover {
+      background-color: #0056b3;
+    }
+    .btn-back:active {
+      background-color: #003f7f;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transform: scale(0.98);
+    }
           </style>
           <script>
             function copyMLB(itemId) {
@@ -454,6 +477,9 @@ app.get('/anuncios', async (req, res) => {
           <div class="anuncios-lista">
             ${anunciosHtml}
           </div>
+          <form method="GET" action="/adm">
+     <button type="submit" class="btn-back">Voltar</button>
+    </form>
           <div id="paginacao">
             ${paginationHtml()}
           </div>
