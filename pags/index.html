@@ -1,0 +1,29 @@
+    <html>
+        <head>
+            <link rel="stylesheet" href="../public/css/adm.css">
+    <body>
+        <div class="navbar">
+        <img src="../public/imgs/logo.png" alt="Logo">
+        </div>
+    
+        <div class="panel-container">
+        <h1>Painel de Administração</h1>
+    
+        <form method="GET" action="/anuncios">
+            <button type="submit">Ver meus Anúncios</button>
+        </form>
+    
+        <form method="GET" action="/adm-anuncios">
+            <button type="submit">Administrar meus Anúncios</button>
+        </form>
+    
+        <form method="GET" action="/vendas">
+            <button type="submit">Vendas</button>
+        </form>
+    
+        <form method="POST" action="/api/logout">
+            <button type="submit">Logout</button>
+        </form>
+        </div>
+    </body>
+    </html>
