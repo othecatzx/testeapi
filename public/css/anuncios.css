@@ -1,0 +1,192 @@
+/* Estilo geral do corpo */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  
+  /* Cabeçalho e navegação */
+  header {
+    background-color: #041322;
+    padding: 10px 0; /* Reduzindo o padding para diminuir o espaço */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  header nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 5px; /* Adicionando um espaço entre a navegação e o título */
+  }
+  
+  header nav a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    margin: 0 15px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  header nav a:hover {
+    color: #09355f; /* Cor ao passar o mouse */
+  }
+  
+  /* Título principal */
+  h1 {
+    text-align: center;
+    padding: 10px; /* Reduzindo o padding para ajustar a distância */
+    background-color: #041322;
+    color: white;
+    margin: 0; /* Removendo a margem para colar mais perto da navegação */
+  }
+  
+  /* Filtro */
+  .filtro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .filtro input,
+  .filtro select,
+  .filtro button {
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    min-width: 150px;
+    max-width: 200px;
+  }
+  
+  .filtro button {
+    background-color: #0d3155;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .filtro button:hover {
+    background-color: #041322;
+  }
+  
+  /* Anúncios */
+  .anuncio {
+    display: flex;
+    margin: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    padding: 20px;
+    align-items: center;
+  }
+  
+  .imagem {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    margin-right: 20px;
+  }
+  
+  .anuncio-info {
+    flex-grow: 1;
+  }
+  
+  .titulo {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .status {
+    font-size: 14px;
+    margin: 5px 0;
+  }
+  
+  .preco,
+  .quantidade {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  
+  .qualidade {
+    font-size: 14px;
+    margin: 5px 0;
+  }
+  
+  .mlb-id {
+    font-size: 14px;
+    margin: 5px 0;
+    cursor: pointer;
+    color: #007bff;
+  }
+  
+  .botao-reativar {
+    padding: 10px;
+    background-color: #ffc107;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 100%;
+  }
+  
+  .botao-reativar:hover {
+    background-color: #e0a800;
+  }
+  
+  /* Paginação */
+  #paginacao {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .pagina-link {
+    padding: 5px 10px;
+    margin: 0 3px;
+    background-color: #041322;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  
+  .pagina-link.ativo {
+    background-color: #235383;
+  }
+  
+  .pagina-link:hover {
+    background-color: #11304e;
+  }
+  
+  /* Botão Voltar */
+  .btn-back {
+    margin: 30px;
+    background-color: #11304e;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-back:hover {
+    background-color: #041322;
+  }
+  
+  .btn-back:active {
+    background-color: #041322;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: scale(0.98);
+  }
+  

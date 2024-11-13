@@ -4,10 +4,11 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const app = express();
+const path = require('path');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// Middleware para servir arquivos estáticos
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static('public'));
 
 
@@ -34,67 +35,7 @@ app.get('/', (req, res) => {
   <head>
     <title>Login</title>
     <style>
-      body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #041322;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      .login-container {
-        background-color: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        padding: 40px;
-        max-width: 350px;
-        width: 100%;
-      }
-      h1 {
-        color: #007BFF;
-        font-size: 24px;
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: 600;
-      }
-      label {
-        font-size: 14px;
-        color: #555;
-        margin-bottom: 5px;
-        display: block;
-      }
-      input {
-        padding: 12px;
-        font-size: 16px;
-        width: 100%;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        outline: none;
-        transition: border-color 0.3s;
-      }
-      input:focus {
-        border-color: #007BFF;
-      }
-      button {
-        padding: 12px;
-        font-size: 16px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        width: 100%;
-        cursor: pointer;
-        transition: background-color 0.3s;
-      }
-      button:hover {
-        background-color: #0056b3;
-      }
-      button:active {
-        background-color: #004085;
-      }
+     
     </style>
   </head>
   <body>
@@ -111,6 +52,8 @@ app.get('/', (req, res) => {
 
   `);
 });
+
+
 
 // Rota para receber o token e redirecionar para o painel de administração
 app.post('/api/anuncios', (req, res) => {
@@ -155,10 +98,17 @@ app.get('/adm', (req, res) => {
         <form method="GET" action="/vendas">
             <button type="submit">Vendas</button>
         </form>
+
+         <form method="GET" action="/promocoes">
+            <button type="submit">promocoes</button>
+        </form>
     
         <form method="POST" action="/api/logout">
             <button type="submit">Logout</button>
         </form>
+        <form action="/pags/planilhacalculo" method="get">
+  <button type="submit">Planilha</button>
+</form>
         </div>
     </body>
     </html>
@@ -166,7 +116,9 @@ app.get('/adm', (req, res) => {
 
   `);
 });
-
+app.get('/pags/planilhacalculo', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'pags', 'planilhacalculo.html'));
+});
 app.get('/vendas', async (req, res) => {
   const accessToken = req.session.accessToken; // Recupera o accessToken da sessão
 
@@ -250,7 +202,6 @@ app.get('/vendas', async (req, res) => {
     res.status(500).send('Erro ao carregar as vendas.');
   }
 });
-
 
 
 app.get('/anuncios', async (req, res) => {
@@ -378,143 +329,7 @@ app.get('/anuncios', async (req, res) => {
       <html>
         <head>
           <title>Anúncios</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-              background-color: #f4f4f4;
-            }
-            h1 {
-              text-align: center;
-              padding: 20px;
-              background-color: #007bff;
-              color: white;
-              margin-bottom: 20px;
-            }
-            .filtro {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              padding: 20px;
-              background-color: #fff;
-              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-              margin-bottom: 20px;
-              flex-wrap: wrap;
-            }
-            .filtro input, .filtro select, .filtro button {
-              padding: 10px;
-              margin: 5px;
-              border-radius: 5px;
-              border: 1px solid #ccc;
-              min-width: 150px;
-              max-width: 200px;
-            }
-            .filtro button {
-              background-color: #28a745;
-              color: white;
-              cursor: pointer;
-            }
-            .filtro button:hover {
-              background-color: #218838;
-            }
-            .anuncio {
-              display: flex;
-              margin: 20px;
-              background-color: white;
-              box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-              border-radius: 5px;
-              overflow: hidden;
-              padding: 20px;
-              align-items: center;
-            }
-            .imagem {
-              width: 150px;
-              height: 150px;
-              object-fit: cover;
-              margin-right: 20px;
-            }
-            .anuncio-info {
-              flex-grow: 1;
-            }
-            .titulo {
-              font-size: 18px;
-              font-weight: bold;
-            }
-            .status {
-              font-size: 14px;
-              margin: 5px 0;
-            }
-            .preco, .quantidade {
-              font-size: 16px;
-              margin: 5px 0;
-            }
-            .qualidade {
-              font-size: 14px;
-              margin: 5px 0;
-            }
-            .mlb-id {
-              font-size: 14px;
-              margin: 5px 0;
-              cursor: pointer;
-              color: #007bff;
-            }
-            .botao-reativar {
-              padding: 10px;
-              background-color: #ffc107;
-              color: white;
-              border: none;
-              cursor: pointer;
-              border-radius: 5px;
-              width: 100%;
-            }
-            .botao-reativar:hover {
-              background-color: #e0a800;
-            }
-            #paginacao {
-              display: flex;
-              justify-content: center;
-              margin-top: 20px;
-            }
-            .pagina-link {
-              padding: 5px 10px;
-              margin: 0 3px;
-              background-color: #007bff;
-              color: white;
-              text-decoration: none;
-              border-radius: 5px;
-            }
-            .pagina-link.ativo {
-              background-color: #28a745;
-            }
-            .pagina-link:hover {
-              background-color: #218838;
-            }
-            /* Botão "Voltar" */
-    .btn-back {
-      margin: 30px;
-      background-color: #007bff;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
-      text-transform: uppercase;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    .btn-back:hover {
-      background-color: #0056b3;
-    }
-    .btn-back:active {
-      background-color: #003f7f;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      transform: scale(0.98);
-    }
-
-          </style>
+            <link rel="stylesheet" href="/css/anuncios.css">
           <script>
             function copyMLB(itemId) {
               const range = document.createRange();
@@ -527,6 +342,12 @@ app.get('/anuncios', async (req, res) => {
           </script>
         </head>
         <body>
+        <header>
+          <nav>
+            <a href="/anuncios">Ver Anúncios</a>
+            <a href="/adm-anuncios">Painel de Administração</a>
+          </nav>
+        </header>
           <h1>Gerenciador de Anúncios</h1>
           <div class="filtro">
             <form method="GET" action="/anuncios">
@@ -579,126 +400,16 @@ app.get('/adm-anuncios', async (req, res) => {
     <html>
       <head>
         <title>Painel de Administração</title>
-        <style>
-          /* Estilos gerais */
-          body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f4f8;
-            margin: 0;
-            padding: 0;
-            color: #333;
-          }
-
-          h1 {
-            background-color: #007BFF;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            margin: 0;
-            border-bottom: 4px solid #0056b3;
-          }
-
-          form {
-            background-color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            margin: 40px auto;
-            padding: 30px;
-            width: 50%;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-          }
-
-          label {
-            font-size: 16px;
-            margin-bottom: 10px;
-            display: block;
-            color: #444;
-          }
-
-          input[type="text"], select, input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            background-color: #f9f9f9;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease;
-          }
-
-          input[type="text"]:focus, select:focus, input[type="file"]:focus {
-            border-color: #007BFF;
-            outline: none;
-          }
-
-          button {
-            background-color: #007BFF;
-            color: white;
-            font-size: 16px;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s ease;
-          }
-
-          button:hover {
-            background-color: #0056b3;
-          }
-
-          .btn-back {
-            background-color: #f44336;
-            width: auto;
-            padding: 14px 20px;
-            margin-top: 20px;
-            text-align: center;
-            color: white;
-            border-radius: 6px;
-          }
-
-          .btn-back:hover {
-            background-color: #d32f2f;
-          }
-
-          /* Responsividade */
-          @media (max-width: 768px) {
-            form {
-              width: 80%;
-            }
-          }
-
-          /* Estilo para o botão de voltar */
-          .back-button-container {
-            text-align: center;
-            margin-top: 30px;
-          }
-
-          /* Popup */
-          .popup {
-            position: fixed;
-            bottom: 20px;   /* Ajustado para o fundo da tela */
-            right: 20px;    /* Ajustado para o lado direito */
-            padding: 15px;
-            border-radius: 6px;
-            color: white;
-            font-size: 16px;
-            z-index: 1000;
-            display: none;
-            max-width: 300px;
-          }
-
-          .popup.success {
-            background-color: #4CAF50; /* Verde para sucesso */
-          }
-
-          .popup.error {
-            background-color: #f44336; /* Vermelho para erro */
-          }
-        </style>
+          <link rel="stylesheet" href="/css/adm-anuncios.css">
       </head>
       <body>
+
+      <header>
+          <nav>
+            <a href="/anuncios">Ver Anúncios</a>
+            <a href="/adm-anuncios">Painel de Administração</a>
+          </nav>
+        </header>
         <h1>Painel de Administração</h1>
 
         <!-- Formulário para atualizar status -->

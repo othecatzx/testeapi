@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    iframe {
+      width: 90%;
+      height: 900px;
+      border: none;
+      margin-bottom: 20px; /* Espaçamento entre o iframe e o botão */
+    }
+
+    .btn-back {
+      background-color: #11304e;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-back:hover {
+      background-color: #041322;
+    }
+
+    .btn-back:active {
+      background-color: #041322;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transform: scale(0.98);
+    }
+  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Planilha Cálculo</title>
+</head>
+<body>
+  <!-- Substitua o link no src pelo seu link de incorporação -->
+  <iframe src="https://docs.google.com/spreadsheets/d/1vsd6LXmbpWeBY8OIU7K4BxWdnn1hNFU8mzDPalZBFVY/edit?usp=sharing"></iframe>
+  <button class="btn-back" onclick="window.history.back();">Voltar</button>
+</body>
+</html>
